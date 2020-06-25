@@ -12,9 +12,14 @@ function fn(impl = () => {}) {
   return mockFn
 }
 
-function spyOn(obj, prop) {
+// const originalGetWinner = utils.getWinner
+// utils.getWinner = fn((p1, p2) => p2)
+const spyOn = (obj, prop) => {
+  // track the original value that we need to override/monkey-patch
   const originalValue = obj[prop]
+  
   obj[prop] = fn()
+  // restore the original value:
   obj[prop].mockRestore = () => (obj[prop] = originalValue)
 }
 
@@ -29,4 +34,5 @@ assert.deepStrictEqual(utils.getWinner.mock.calls, [
 ])
 
 // cleanup
+// utils.getWinner = originalGetWinner
 utils.getWinner.mockRestore()
