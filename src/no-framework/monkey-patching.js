@@ -1,20 +1,23 @@
-const assert = require('assert')
-const thumbWar = require('../thumb-war')
-const utils = require('../utils')
+const assert = require("assert");
+const thumbWar = require("../thumb-war");
+const utils = require("../utils");
 
-/**
- * "Monkey-patching" illustrated by the following process:
- */
+// we can override the `getWinner` function here
+// by making sure that it always returns one of
+// the players as the winner; this ensures that
+// our assertion will work correctly:
+//
+// this is called MONKEY PATCHING, and makes our
+// test DETERMINISTIC:
+const originalGetWinner = utils.getWinner;
+utils.getWiner = (p1, p2) => p1;
 
-// create copy of the utility function as it exists
-const originalGetWinner = utils.getWinner
+// first, get the winner of the thumbWar
+const winner = thumbWar("Kent", "Dude");
 
-// override it with deterministic function that tests
-// as we expect
-utils.getWinner = (p1, p2) => p1
+// then test that Ken won:
+assert.strictEqual(winner, "Kent");
 
-const winner = thumbWar('Kent C Dodds', 'Ken Wheeler')
-assert.strictEqual(winner, 'Kent C Dodds')
-
-// re-assign the utility to original
-utils.getWinner = originalGetWinner
+// it's important to clean-up our monkey-patching,
+// so that further tests are not impacted.
+utils.getWinner = originalGetWinner;
