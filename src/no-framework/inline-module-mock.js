@@ -1,8 +1,11 @@
-const assert = require("assert");
-const thumbWar = require("../thumb-war");
-// const utils = require('../utils')
-
-console.log("require.cache", require.cache);
+function fn(impl = () => {}) {
+  const mockFn = (...args) => {
+    mockFn.mock.calls.push(args);
+    return impl(...args);
+  };
+  mockFn.mock = { calls: [] };
+  return mockFn;
+}
 
 /**
  * jest.mock works because jest is in control of the whole
@@ -13,9 +16,11 @@ console.log("require.cache", require.cache);
  * and doing the following:
  */
 const utilsPath = require.resolve("../utils");
-// assign an object to `require.cache[utilsPath]`
+
+// assign an object to `require.cache[utilsPath] to override it:`
 require.cache[utilsPath] = {
-  // needs to resemble a module, so assign `utilsPath` value to `id`
+  // the object we're mocking needs to resemble a module,
+  // so assign `utilsPath` value to `id`
   id: utilsPath,
   filename: utilsPath,
   loaded: true,
@@ -24,14 +29,9 @@ require.cache[utilsPath] = {
   },
 };
 
-function fn(impl = () => {}) {
-  const mockFn = (...args) => {
-    mockFn.mock.calls.push(args);
-    return impl(...args);
-  };
-  mockFn.mock = { calls: [] };
-  return mockFn;
-}
+const assert = require("assert");
+const thumbWar = require("../thumb-war");
+const utils = require("../utils");
 
 const winner = thumbWar("Kent C. Dodds", "Ken Wheeler");
 assert.strictEqual(winner, "Kent C. Dodds");
